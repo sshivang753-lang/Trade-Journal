@@ -5,79 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shubham's Trade Journal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Load Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
     <style>
+        :root {
+            --bg-main: #0a0a0a;
+            --bg-card: #171717;
+            --border-color: #262626;
+            --text-primary: #e5e5e5;
+            --text-secondary: #a3a3a3;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+        }
+
         body { 
-            background-color: #0f172a; 
-            color: #e2e8f0; 
+            background-color: var(--bg-main); 
+            color: var(--text-primary); 
             font-family: 'Inter', sans-serif; 
             -webkit-font-smoothing: antialiased;
         }
         
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
         /* Input Styling */
         .input-group label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            color: #94a3b8;
+            color: var(--text-secondary);
             margin-bottom: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.025em;
+            letter-spacing: 0.05em;
         }
         .input-field {
             width: 100%;
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 6px;
+            background-color: #050505;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
             padding: 10px 12px;
             color: white;
-            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
             transition: all 0.2s;
             outline: none;
         }
         .input-field:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+            border-color: #525252;
+            box-shadow: 0 0 0 1px #525252;
         }
-        /* Fix for Select dropdown options */
-        option {
-            background-color: #1e293b;
-            color: white;
-        }
+        option { background-color: var(--bg-card); color: white; }
         
         /* Stat Cards */
         .stat-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
         }
-        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; font-family: 'Inter', sans-serif; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .stat-value { font-size: 1.75rem; font-weight: 500; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.03em; }
 
-        /* Button Styling */
+        /* Buttons */
         .btn-primary {
-            background: #2563eb;
-            color: white;
+            background: white;
+            color: black;
             font-weight: 600;
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 4px;
             width: 100%;
-            transition: background 0.2s;
+            transition: all 0.2s;
             cursor: pointer;
+            border: 1px solid white;
         }
-        .btn-primary:hover { background: #1d4ed8; }
+        .btn-primary:hover { background: #e5e5e5; border-color: #e5e5e5; }
         
         .btn-secondary {
-            background: #1e293b;
-            border: 1px solid #334155;
-            color: #cbd5e1;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
             padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
             font-weight: 500;
             display: flex;
             align-items: center;
@@ -85,104 +96,137 @@
             transition: 0.2s;
             cursor: pointer;
         }
-        .btn-secondary:hover { border-color: #475569; background: #334155; }
-
-        /* Table Styling */
-        .table-wrapper {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .btn-secondary:hover { border-color: var(--accent-red); color: var(--accent-red); background: rgba(239, 68, 68, 0.05); }
+        
+        .btn-delete {
+            color: #525252;
+            padding: 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
         }
-        table { width: 100%; border-collapse: collapse; }
+        .btn-delete:hover {
+            background-color: #262626;
+            color: var(--accent-red);
+        }
+
+        /* FIXED TABLE SCROLLING */
+        .table-container {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            /* Critical: Allows scrolling in both directions if needed */
+            overflow: auto; 
+            /* Max height creates the "sliding" effect vertically */
+            max-height: 500px; 
+            position: relative;
+            background: var(--bg-main);
+        }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        
         th {
-            background: #0f172a;
+            /* Sticky Header Magic */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #171717; /* Must be opaque to hide scrolling text behind it */
+            
             text-align: left;
-            padding: 16px;
-            font-size: 0.75rem;
-            color: #64748b;
+            padding: 12px 16px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
             font-weight: 600;
             text-transform: uppercase;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
+            box-shadow: 0 1px 0px rgba(0,0,0,0.5); /* Subtle shadow line */
         }
+        
         td {
-            padding: 16px;
-            border-bottom: 1px solid #334155;
-            font-size: 0.9rem;
-            color: #cbd5e1;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-primary);
             vertical-align: middle;
+            white-space: nowrap; /* Prevents weird wrapping */
         }
         tr:last-child td { border-bottom: none; }
+        tbody tr { transition: background 0.1s; background: var(--bg-main); }
+        tbody tr:hover { background: #121212; }
         
         /* Utilities */
-        .text-profit { color: #34d399; }
-        .text-loss { color: #fb7185; }
-        .text-neutral { color: #f8fafc; }
-        .overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .text-profit { color: var(--accent-green); }
+        .text-loss { color: var(--accent-red); }
+        
+        .form-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
     </style>
 </head>
-<body class="min-h-screen p-4 lg:p-8">
+<body class="min-h-screen p-4 md:p-8">
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-6 border-b border-neutral-800 pb-6">
             <div>
-                <h1 class="text-2xl font-bold text-white">Hey SHUBHAM!</h1>
-                <p class="text-slate-400 text-sm mt-1">How was your day?</p>
+                <div class="text-xs font-mono text-neutral-500 mb-1 uppercase tracking-widest">Terminal</div>
+                <h1 class="text-3xl font-bold text-white tracking-tight">Shubham's Journal</h1>
             </div>
-            <div class="flex gap-3 w-full md:w-auto">
-                <button type="button" onclick="downloadCSV()" class="btn-secondary flex-1 md:flex-none justify-center">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    Statement
-                </button>
-                <button type="button" onclick="clearData()" class="btn-secondary flex-1 md:flex-none justify-center text-rose-400 hover:text-rose-300 hover:border-rose-900 hover:bg-rose-900/10">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    Reset
+            <div>
+                <button type="button" onclick="clearData()" class="btn-secondary">
+                    <i data-lucide="refresh-ccw" class="w-3 h-3"></i>
+                    Reset Database
                 </button>
             </div>
         </div>
 
-        <!-- Dashboard / Stats -->
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="stat-card">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="stat-card group">
                 <div class="stat-label">Net PnL (USDT)</div>
-                <div id="totalPnL" class="stat-value text-neutral">0.00</div>
+                <div id="totalPnL" class="stat-value text-neutral-200">0.00</div>
+                <div class="absolute right-4 top-4 opacity-10 group-hover:opacity-20 transition">
+                    <i data-lucide="dollar-sign" class="w-8 h-8 text-white"></i>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Success Rate</div>
-                <div id="winRate" class="stat-value text-neutral">0%</div>
+            <div class="stat-card group">
+                <div class="stat-label">Win Rate</div>
+                <div id="winRate" class="stat-value text-neutral-200">0%</div>
+                <div class="absolute right-4 top-4 opacity-10 group-hover:opacity-20 transition">
+                    <i data-lucide="activity" class="w-8 h-8 text-white"></i>
+                </div>
             </div>
         </div>
 
-        <!-- Input Section -->
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 mb-8 shadow-lg backdrop-blur-sm">
-            <form id="entryForm" onsubmit="handleSubmit(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+        <div class="form-panel shadow-xl">
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-1 h-4 bg-white rounded-full"></div>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-white">New Entry</h3>
+            </div>
+
+            <form id="entryForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                     <div class="input-group">
-                        <label>Date (Required)</label>
+                        <label>Date</label>
                         <input type="date" id="date" class="input-field" required>
                     </div>
                     <div class="input-group">
-                        <label>Pair (Required)</label>
-                        <input type="text" id="pair" placeholder="BTC" class="input-field uppercase" required>
+                        <label>Pair</label>
+                        <input type="text" id="pair" placeholder="BTCUSDT" class="input-field uppercase" required>
                     </div>
-                    <!-- Optional Field -->
                     <div class="input-group">
                         <label>Direction</label>
                         <select id="direction" class="input-field">
-                            <option value="">Not Defined</option>
+                            <option value="">-- Select --</option>
                             <option value="Long">Long</option>
                             <option value="Short">Short</option>
                         </select>
                     </div>
-                    <!-- Optional Field -->
                     <div class="input-group">
-                        <label>Market Condition</label>
+                        <label>Condition</label>
                         <select id="condition" class="input-field">
-                            <option value="">Not Defined</option>
+                            <option value="">-- Select --</option>
                             <option value="Trend Up">Trend Up</option>
                             <option value="Trend Down">Trend Down</option>
                             <option value="Range">Range</option>
@@ -190,150 +234,137 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-5">
-                     <!-- Optional Field -->
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
                      <div class="input-group">
-                        <label>Setup Type</label>
+                        <label>Setup</label>
                         <select id="setup" class="input-field">
-                            <option value="">Not Defined</option>
+                            <option value="">-- Select --</option>
                             <option value="Breakout">Breakout</option>
                             <option value="Break–Retest">Break–Retest</option>
-                            <option value="Liquidity Grab">Liquidity Grab</option>
+                            <option value="Liquidity Grab">Liq. Grab</option>
+                            <option value="SFP">SFP</option>
                         </select>
                     </div>
                     <div class="input-group">
-                        <label>Entry Price</label>
+                        <label>Entry ($)</label>
                         <input type="number" step="any" id="entry" placeholder="0.00" class="input-field" required>
                     </div>
                     <div class="input-group">
-                        <label>Stop Loss</label>
+                        <label>Stop Loss ($)</label>
                         <input type="number" step="any" id="sl" placeholder="0.00" class="input-field" required>
                     </div>
                     <div class="input-group">
-                        <label>Take Profit</label>
+                        <label>Take Profit ($)</label>
                         <input type="number" step="any" id="tp" placeholder="0.00" class="input-field" required>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="input-group">
-                        <label>Result (USDT) (Required)</label>
-                        <input type="number" step="any" id="result" placeholder="+/- Amount" class="input-field" required>
+                        <label>P&L Result (USDT)</label>
+                        <input type="number" step="any" id="result" placeholder="e.g. 50 or -20" class="input-field font-bold" required>
                     </div>
-                    <!-- Optional Field -->
                     <div class="input-group">
-                        <label>Note</label>
-                        <input type="text" id="note" placeholder="Short note (Optional)" class="input-field" maxlength="60">
+                        <label>Notes</label>
+                        <input type="text" id="note" placeholder="Execution details..." class="input-field" maxlength="80">
                     </div>
                 </div>
 
-                <button type="submit" class="btn-primary">Log Entry</button>
+                <button type="submit" class="btn-primary">Execute Log</button>
             </form>
         </div>
 
-        <!-- Data Table -->
-        <div class="table-wrapper overflow-x-auto">
+        <div class="table-container shadow-2xl">
             <table id="journalTable">
                 <thead>
                     <tr>
-                        <th class="w-32">Date</th>
-                        <th class="w-32">Pair / Dir</th>
-                        <th class="w-32">Condition</th>
+                        <th class="w-28">Date</th>
+                        <th class="w-24">Pair</th>
+                        <th class="w-24">Side</th>
                         <th class="w-32">Setup</th>
-                        <th class="w-64">Entry / SL / TP</th>
-                        <th class="w-24 text-right">R:R</th>
-                        <th class="w-32 text-right">Result</th>
-                        <th>Note</th>
-                        <th class="w-12"></th>
+                        <th class="">Prices (E / S / T)</th>
+                        <th class="w-20 text-right">R:R</th>
+                        <th class="w-28 text-right">PnL</th>
+                        <th class="pl-6">Note</th>
+                        <th class="w-12 text-center"></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- JS Injects Rows Here -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
         
-        <div id="emptyState" class="hidden text-center py-12">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800 text-slate-500 mb-4">
-                <i data-lucide="file-text" class="w-6 h-6"></i>
+        <div id="emptyState" class="hidden text-center py-20 border border-neutral-800 rounded-md mt-4 border-dashed">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neutral-900 text-neutral-600 mb-3">
+                <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
             </div>
-            <h3 class="text-slate-400 font-medium">No entries found</h3>
-            <p class="text-slate-600 text-sm mt-1">Time to print some money, Shubham.</p>
+            <p class="text-neutral-500 text-sm font-mono">No trade data available.</p>
         </div>
 
     </div>
 
     <script>
-        // 1. Global State Declaration (Must be first)
+        // 1. Global State
         let trades = [];
 
-        // 2. Initialize App Logic
+        // 2. Initialize
         function initApp() {
-            // Try to load from LocalStorage safely
             try {
                 const storedData = localStorage.getItem('shubham_journal_db');
-                if (storedData) {
-                    trades = JSON.parse(storedData);
-                }
+                if (storedData) trades = JSON.parse(storedData);
             } catch (err) {
-                console.error('LocalStorage access failed or empty:', err);
+                console.error('LocalStorage error:', err);
                 trades = [];
             }
 
-            // Set Date to Today (Safely)
             const dateInput = document.getElementById('date');
-            if(dateInput) {
-                dateInput.valueAsDate = new Date();
-            }
+            if(dateInput) dateInput.valueAsDate = new Date();
 
-            // Render Initial State
+            const form = document.getElementById('entryForm');
+            if (form) form.addEventListener('submit', handleFormSubmit);
+
             renderTable();
             updateStats();
-            
-            // Initialize Icons safely
             refreshIcons();
         }
 
-        // Helper to refresh icons without crashing
         function refreshIcons() {
-            if (window.lucide) {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
                 window.lucide.createIcons();
             }
         }
 
-        function handleSubmit(e) {
-            e.preventDefault(); // Stop page reload
+        // 3. Form Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
 
-            // Get Values
-            const entryPrice = parseFloat(document.getElementById('entry').value);
-            const slPrice = parseFloat(document.getElementById('sl').value);
-            const tpPrice = parseFloat(document.getElementById('tp').value);
-            
-            // Calculate R:R
+            const entryPrice = parseFloat(document.getElementById('entry').value) || 0;
+            const slPrice = parseFloat(document.getElementById('sl').value) || 0;
+            const tpPrice = parseFloat(document.getElementById('tp').value) || 0;
+            const resultVal = parseFloat(document.getElementById('result').value) || 0;
+
             const risk = Math.abs(entryPrice - slPrice);
             const reward = Math.abs(tpPrice - entryPrice);
-            const rrValue = risk === 0 ? 0 : (reward / risk).toFixed(1);
-            const rrString = `1:${rrValue}`;
-
-            // Handle Optional Fields
-            const directionVal = document.getElementById('direction').value;
-            const conditionVal = document.getElementById('condition').value;
-            const setupVal = document.getElementById('setup').value;
-            const noteVal = document.getElementById('note').value;
+            let rrString = "-";
+            
+            if (risk > 0) {
+                const rrValue = (reward / risk).toFixed(2);
+                rrString = `1:${parseFloat(rrValue)}`;
+            }
 
             const trade = {
                 id: Date.now(),
                 date: document.getElementById('date').value,
                 pair: document.getElementById('pair').value.toUpperCase(),
-                direction: directionVal || "-",
-                condition: conditionVal || "-",
-                setup: setupVal || "-",
+                direction: document.getElementById('direction').value || "-",
+                condition: document.getElementById('condition').value || "-",
+                setup: document.getElementById('setup').value || "-",
                 entry: entryPrice,
                 sl: slPrice,
                 tp: tpPrice,
                 rr: rrString,
-                result: parseFloat(document.getElementById('result').value),
-                note: noteVal || "-"
+                result: resultVal,
+                note: document.getElementById('note').value || "-"
             };
 
             trades.unshift(trade);
@@ -342,12 +373,12 @@
             updateStats();
             
             e.target.reset();
-            // Reset date to today after clearing
             document.getElementById('date').valueAsDate = new Date();
         }
 
-        function deleteTrade(id) {
-            if(confirm('Remove this entry permanently?')) {
+        // 4. Management
+        window.deleteTrade = function(id) {
+            if(confirm('Delete this trade entry?')) {
                 trades = trades.filter(t => t.id !== id);
                 saveData();
                 renderTable();
@@ -355,8 +386,8 @@
             }
         }
 
-        function clearData() {
-            if(confirm('WARNING: This will delete your entire journal history. Continue?')) {
+        window.clearData = function() {
+            if(confirm('RESET DATABASE: This will wipe all trade history. Continue?')) {
                 trades = [];
                 saveData();
                 renderTable();
@@ -365,11 +396,7 @@
         }
 
         function saveData() {
-            try {
-                localStorage.setItem('shubham_journal_db', JSON.stringify(trades));
-            } catch (e) {
-                console.error("Could not save to localStorage", e);
-            }
+            localStorage.setItem('shubham_journal_db', JSON.stringify(trades));
         }
 
         function updateStats() {
@@ -384,9 +411,8 @@
                 return;
             }
 
-            const totalPnL = trades.reduce((acc, trade) => acc + trade.result, 0);
+            const totalPnL = trades.reduce((acc, t) => acc + t.result, 0);
             const formattedPnL = (totalPnL > 0 ? "+" : "") + totalPnL.toFixed(2);
-            
             pnlEl.innerText = formattedPnL;
             
             if (totalPnL > 0) pnlEl.className = "stat-value text-profit";
@@ -397,7 +423,6 @@
             const rate = ((wins / trades.length) * 100).toFixed(0);
             
             winRateEl.innerText = rate + "%";
-            
             if (rate >= 50) winRateEl.className = "stat-value text-profit";
             else if (rate > 0) winRateEl.className = "stat-value text-yellow-400";
             else winRateEl.className = "stat-value text-loss";
@@ -406,83 +431,54 @@
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             const emptyState = document.getElementById('emptyState');
+            const tableContainer = document.querySelector('.table-container');
             
             tbody.innerHTML = '';
 
-            // Handle Visibility
             if (trades.length === 0) {
-                tbody.parentElement.classList.add('hidden');
+                tableContainer.classList.add('hidden');
                 emptyState.classList.remove('hidden');
-                // Refresh icons for the empty state icon
                 refreshIcons();
                 return;
             }
             
-            tbody.parentElement.classList.remove('hidden');
+            tableContainer.classList.remove('hidden');
             emptyState.classList.add('hidden');
 
             trades.forEach(t => {
                 const tr = document.createElement('tr');
                 const resultClass = t.result >= 0 ? 'text-profit' : 'text-loss';
                 const resultSign = t.result > 0 ? '+' : '';
+                
+                const dirClass = t.direction === 'Long' ? 'text-emerald-400' : (t.direction === 'Short' ? 'text-rose-400' : 'text-neutral-500');
 
                 tr.innerHTML = `
-                    <td class="text-slate-400 font-mono text-xs">${t.date}</td>
-                    <td>
-                        <div class="font-bold text-white">${t.pair}</div>
-                        <span class="text-xs text-slate-500">${t.direction}</span>
+                    <td class="text-neutral-500 font-mono text-xs">${t.date}</td>
+                    <td class="font-bold font-mono">${t.pair}</td>
+                    <td><span class="text-xs font-medium ${dirClass} bg-white/5 px-2 py-1 rounded">${t.direction}</span></td>
+                    <td class="text-neutral-400 text-xs">${t.setup}</td>
+                    <td class="font-mono text-xs">
+                        <span class="text-neutral-300">${t.entry}</span> 
+                        <span class="text-neutral-600 mx-1">/</span> 
+                        <span class="text-neutral-500">${t.sl}</span>
+                        <span class="text-neutral-600 mx-1">/</span>
+                        <span class="text-neutral-500">${t.tp}</span>
                     </td>
-                    <td class="text-slate-400 text-xs">${t.condition}</td>
-                    <td class="text-slate-400 text-xs">${t.setup}</td>
-                    <td>
-                        <div class="font-mono text-xs text-slate-300">E: ${t.entry}</div>
-                        <div class="font-mono text-xs text-slate-500">S: ${t.sl}</div>
-                        <div class="font-mono text-xs text-slate-500">T: ${t.tp}</div>
-                    </td>
-                    <td class="text-right font-bold text-slate-300 font-mono">${t.rr}</td>
-                    <td class="text-right ${resultClass}">${resultSign}${t.result}</td>
-                    <td class="italic text-slate-500 text-sm max-w-xs truncate">${t.note}</td>
-                    <td class="text-right">
-                        <button onclick="deleteTrade(${t.id})" class="text-slate-600 hover:text-rose-500 p-2 transition-colors">
-                            <i data-lucide="x" class="w-4 h-4"></i>
+                    <td class="text-right font-medium text-neutral-400 font-mono text-xs">${t.rr}</td>
+                    <td class="text-right font-bold font-mono ${resultClass}">${resultSign}${t.result}</td>
+                    <td class="text-neutral-500 text-xs pl-6 max-w-xs truncate">${t.note}</td>
+                    <td class="text-center">
+                        <button onclick="deleteTrade(${t.id})" class="btn-delete" title="Delete">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
-            
-            // Re-initialize icons for new rows
             refreshIcons();
         }
 
-        function downloadCSV() {
-            if(trades.length === 0) {
-                alert("No data to export.");
-                return;
-            }
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Date,Pair,Direction,Condition,Setup,Entry,SL,TP,RR,Result,Note\n";
-
-            trades.forEach(t => {
-                const row = [
-                    t.date, t.pair, t.direction, t.condition, t.setup,
-                    t.entry, t.sl, t.tp, t.rr, t.result, `"${t.note.replace(/"/g, '""')}"`
-                ].join(",");
-                csvContent += row + "\n";
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Shubham_Trades_" + new Date().toISOString().slice(0,10) + ".csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Start App when DOM is ready
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
-
