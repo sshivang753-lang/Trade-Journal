@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shubham's Trade Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load Lucide Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.js"></script>
+    <style>
+        body { 
+            background-color: #0f172a; 
+            color: #e2e8f0; 
+            font-family: 'Inter', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Input Styling */
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+        .input-field {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        /* Fix for Select dropdown options */
+        option {
+            background-color: #1e293b;
+            color: white;
+        }
+        
+        /* Stat Cards */
+        .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; font-family: 'Inter', sans-serif; }
+
+        /* Button Styling */
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        
+        .btn-secondary {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { border-color: #475569; background: #334155; }
+
+        /* Table Styling */
+        .table-wrapper {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: #0f172a;
+            text-align: left;
+            padding: 16px;
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 1px solid #334155;
+            white-space: nowrap;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #334155;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        
+        /* Utilities */
+        .text-profit { color: #34d399; }
+        .text-loss { color: #fb7185; }
+        .text-neutral { color: #f8fafc; }
+        .overflow-x-auto { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    </style>
+</head>
+<body class="min-h-screen p-4 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Hey SHUBHAM!</h1>
+                <p class="text-slate-400 text-sm mt-1">How was your day?</p>
+            </div>
+            <div class="flex gap-3 w-full md:w-auto">
+                <button type="button" onclick="downloadCSV()" class="btn-secondary flex-1 md:flex-none justify-center">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Statement
+                </button>
+                <button type="button" onclick="clearData()" class="btn-secondary flex-1 md:flex-none justify-center text-rose-400 hover:text-rose-300 hover:border-rose-900 hover:bg-rose-900/10">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard / Stats -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="stat-card">
+                <div class="stat-label">Net PnL (USDT)</div>
+                <div id="totalPnL" class="stat-value text-neutral">0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Success Rate</div>
+                <div id="winRate" class="stat-value text-neutral">0%</div>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 mb-8 shadow-lg backdrop-blur-sm">
+            <form id="entryForm" onsubmit="handleSubmit(event)">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+                    <div class="input-group">
+                        <label>Date (Required)</label>
+                        <input type="date" id="date" class="input-field" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Pair (Required)</label>
+                        <input type="text" id="pair" placeholder="BTC" class="input-field uppercase" required>
+                    </div>
+                    <!-- Optional Field -->
+                    <div class="input-group">
+                        <label>Direction</label>
+                        <select id="direction" class="input-field">
+                            <option value="">Not Defined</option>
+                            <option value="Long">Long</option>
+                            <option value="Short">Short</option>
+                        </select>
+                    </div>
+                    <!-- Optional Field -->
+                    <div class="input-group">
+                        <label>Market Condition</label>
+                        <select id="condition" class="input-field">
+                            <option value="">Not Defined</option>
+                            <option value="Trend Up">Trend Up</option>
+                            <option value="Trend Down">Trend Down</option>
+                            <option value="Range">Range</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 mb-5">
+                     <!-- Optional Field -->
+                     <div class="input-group">
+                        <label>Setup Type</label>
+                        <select id="setup" class="input-field">
+                            <option value="">Not Defined</option>
+                            <option value="Breakout">Breakout</option>
+                            <option value="Break–Retest">Break–Retest</option>
+                            <option value="Liquidity Grab">Liquidity Grab</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Entry Price</label>
+                        <input type="number" step="any" id="entry" placeholder="0.00" class="input-field" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Stop Loss</label>
+                        <input type="number" step="any" id="sl" placeholder="0.00" class="input-field" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Take Profit</label>
+                        <input type="number" step="any" id="tp" placeholder="0.00" class="input-field" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <div class="input-group">
+                        <label>Result (USDT) (Required)</label>
+                        <input type="number" step="any" id="result" placeholder="+/- Amount" class="input-field" required>
+                    </div>
+                    <!-- Optional Field -->
+                    <div class="input-group">
+                        <label>Note</label>
+                        <input type="text" id="note" placeholder="Short note (Optional)" class="input-field" maxlength="60">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Log Entry</button>
+            </form>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-wrapper overflow-x-auto">
+            <table id="journalTable">
+                <thead>
+                    <tr>
+                        <th class="w-32">Date</th>
+                        <th class="w-32">Pair / Dir</th>
+                        <th class="w-32">Condition</th>
+                        <th class="w-32">Setup</th>
+                        <th class="w-64">Entry / SL / TP</th>
+                        <th class="w-24 text-right">R:R</th>
+                        <th class="w-32 text-right">Result</th>
+                        <th>Note</th>
+                        <th class="w-12"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- JS Injects Rows Here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="emptyState" class="hidden text-center py-12">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800 text-slate-500 mb-4">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-slate-400 font-medium">No entries found</h3>
+            <p class="text-slate-600 text-sm mt-1">Time to print some money, Shubham.</p>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Global State Declaration (Must be first)
+        let trades = [];
+
+        // 2. Initialize App Logic
+        function initApp() {
+            // Try to load from LocalStorage safely
+            try {
+                const storedData = localStorage.getItem('shubham_journal_db');
+                if (storedData) {
+                    trades = JSON.parse(storedData);
+                }
+            } catch (err) {
+                console.error('LocalStorage access failed or empty:', err);
+                trades = [];
+            }
+
+            // Set Date to Today (Safely)
+            const dateInput = document.getElementById('date');
+            if(dateInput) {
+                dateInput.valueAsDate = new Date();
+            }
+
+            // Render Initial State
+            renderTable();
+            updateStats();
+            
+            // Initialize Icons safely
+            refreshIcons();
+        }
+
+        // Helper to refresh icons without crashing
+        function refreshIcons() {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault(); // Stop page reload
+
+            // Get Values
+            const entryPrice = parseFloat(document.getElementById('entry').value);
+            const slPrice = parseFloat(document.getElementById('sl').value);
+            const tpPrice = parseFloat(document.getElementById('tp').value);
+            
+            // Calculate R:R
+            const risk = Math.abs(entryPrice - slPrice);
+            const reward = Math.abs(tpPrice - entryPrice);
+            const rrValue = risk === 0 ? 0 : (reward / risk).toFixed(1);
+            const rrString = `1:${rrValue}`;
+
+            // Handle Optional Fields
+            const directionVal = document.getElementById('direction').value;
+            const conditionVal = document.getElementById('condition').value;
+            const setupVal = document.getElementById('setup').value;
+            const noteVal = document.getElementById('note').value;
+
+            const trade = {
+                id: Date.now(),
+                date: document.getElementById('date').value,
+                pair: document.getElementById('pair').value.toUpperCase(),
+                direction: directionVal || "-",
+                condition: conditionVal || "-",
+                setup: setupVal || "-",
+                entry: entryPrice,
+                sl: slPrice,
+                tp: tpPrice,
+                rr: rrString,
+                result: parseFloat(document.getElementById('result').value),
+                note: noteVal || "-"
+            };
+
+            trades.unshift(trade);
+            saveData();
+            renderTable();
+            updateStats();
+            
+            e.target.reset();
+            // Reset date to today after clearing
+            document.getElementById('date').valueAsDate = new Date();
+        }
+
+        function deleteTrade(id) {
+            if(confirm('Remove this entry permanently?')) {
+                trades = trades.filter(t => t.id !== id);
+                saveData();
+                renderTable();
+                updateStats();
+            }
+        }
+
+        function clearData() {
+            if(confirm('WARNING: This will delete your entire journal history. Continue?')) {
+                trades = [];
+                saveData();
+                renderTable();
+                updateStats();
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('shubham_journal_db', JSON.stringify(trades));
+            } catch (e) {
+                console.error("Could not save to localStorage", e);
+            }
+        }
+
+        function updateStats() {
+            const pnlEl = document.getElementById('totalPnL');
+            const winRateEl = document.getElementById('winRate');
+            
+            if (trades.length === 0) {
+                pnlEl.innerText = "0.00";
+                pnlEl.className = "stat-value text-neutral";
+                winRateEl.innerText = "0%";
+                winRateEl.className = "stat-value text-neutral";
+                return;
+            }
+
+            const totalPnL = trades.reduce((acc, trade) => acc + trade.result, 0);
+            const formattedPnL = (totalPnL > 0 ? "+" : "") + totalPnL.toFixed(2);
+            
+            pnlEl.innerText = formattedPnL;
+            
+            if (totalPnL > 0) pnlEl.className = "stat-value text-profit";
+            else if (totalPnL < 0) pnlEl.className = "stat-value text-loss";
+            else pnlEl.className = "stat-value text-neutral";
+
+            const wins = trades.filter(t => t.result > 0).length;
+            const rate = ((wins / trades.length) * 100).toFixed(0);
+            
+            winRateEl.innerText = rate + "%";
+            
+            if (rate >= 50) winRateEl.className = "stat-value text-profit";
+            else if (rate > 0) winRateEl.className = "stat-value text-yellow-400";
+            else winRateEl.className = "stat-value text-loss";
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            tbody.innerHTML = '';
+
+            // Handle Visibility
+            if (trades.length === 0) {
+                tbody.parentElement.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                // Refresh icons for the empty state icon
+                refreshIcons();
+                return;
+            }
+            
+            tbody.parentElement.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            trades.forEach(t => {
+                const tr = document.createElement('tr');
+                const resultClass = t.result >= 0 ? 'text-profit' : 'text-loss';
+                const resultSign = t.result > 0 ? '+' : '';
+
+                tr.innerHTML = `
+                    <td class="text-slate-400 font-mono text-xs">${t.date}</td>
+                    <td>
+                        <div class="font-bold text-white">${t.pair}</div>
+                        <span class="text-xs text-slate-500">${t.direction}</span>
+                    </td>
+                    <td class="text-slate-400 text-xs">${t.condition}</td>
+                    <td class="text-slate-400 text-xs">${t.setup}</td>
+                    <td>
+                        <div class="font-mono text-xs text-slate-300">E: ${t.entry}</div>
+                        <div class="font-mono text-xs text-slate-500">S: ${t.sl}</div>
+                        <div class="font-mono text-xs text-slate-500">T: ${t.tp}</div>
+                    </td>
+                    <td class="text-right font-bold text-slate-300 font-mono">${t.rr}</td>
+                    <td class="text-right ${resultClass}">${resultSign}${t.result}</td>
+                    <td class="italic text-slate-500 text-sm max-w-xs truncate">${t.note}</td>
+                    <td class="text-right">
+                        <button onclick="deleteTrade(${t.id})" class="text-slate-600 hover:text-rose-500 p-2 transition-colors">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            // Re-initialize icons for new rows
+            refreshIcons();
+        }
+
+        function downloadCSV() {
+            if(trades.length === 0) {
+                alert("No data to export.");
+                return;
+            }
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Date,Pair,Direction,Condition,Setup,Entry,SL,TP,RR,Result,Note\n";
+
+            trades.forEach(t => {
+                const row = [
+                    t.date, t.pair, t.direction, t.condition, t.setup,
+                    t.entry, t.sl, t.tp, t.rr, t.result, `"${t.note.replace(/"/g, '""')}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Shubham_Trades_" + new Date().toISOString().slice(0,10) + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Start App when DOM is ready
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
+
